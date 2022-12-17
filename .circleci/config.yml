@@ -3,6 +3,20 @@ version: 2.1
 orbs:
     slack: circleci/slack@4.12.0
 
+commands:
+    destroy-environment:
+        description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+        parameters:
+            stack-name:
+                description: Name of the stack to destroy.
+                type: string
+        steps:
+            - run:
+                  name: Destroy environments
+                  when: on_fail
+                  command: |
+                      aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
+
 jobs:
     build-frontend:
         docker:
@@ -78,11 +92,6 @@ jobs:
                   event: fail
                   mentions: "@EngineeringTeam"
                   template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
 
     test-backend:
         docker:
@@ -103,11 +112,6 @@ jobs:
                   event: fail
                   mentions: "@EngineeringTeam"
                   template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
 
     scan-frontend:
         docker:
@@ -130,11 +134,6 @@ jobs:
                   event: fail
                   mentions: "@EngineeringTeam"
                   template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
 
     scan-backend:
         docker:
@@ -157,11 +156,43 @@ jobs:
                   event: fail
                   mentions: "@EngineeringTeam"
                   template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
+
+    deploy-infrastructure:
+        docker:
+            - image: amazon/aws-cli
+        steps:
+            - checkout
+            - run:
+                  name: Ensure back-end infrastructure exists
+                  command: |
+                      aws cloudformation deploy \
+                      --template-file .circleci/files/backend.yml \
+                      --tags project=udapeople \
+                      --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+            - run:
+                  name: Ensure front-end infrastructure exist
+                  command: |
+                      aws cloudformation deploy \
+                      --template-file .circleci/files/frontend.yml \
+                      --tags project=udapeople \
+                      --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+            - run:
+                  name: Add back-end ip to ansible inventory
+                  command: |
+                      cat <<EOF >>~/project/.circleci/ansible/hosts
+                      $(aws ec2 describe-instances --instance-ids ${CIRCLE_WORKFLOW_ID:0:7} --query 'Reservations[*].Instances[*].PublicIpAddress' --region=us-east-1 --output text)
+                      EOF
+            - persist_to_workspace:
+                  root: ~/
+                  paths:
+                      - project/.circleci/ansible/hosts
+
+            - destroy-environment:
+                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            - destroy-environment:
+                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
 
 workflows:
     default:
