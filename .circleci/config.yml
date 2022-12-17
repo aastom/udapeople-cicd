@@ -197,12 +197,12 @@ jobs:
                   paths:
                       - project/.circleci/ansible/hosts
 
-            - destroy-environment:
-                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-                  clean: on_fail
-            - destroy-environment:
-                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-                  clean: on_fail
+            # - destroy-environment:
+            #       stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            #       clean: on_fail
+            # - destroy-environment:
+            #       stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            #       clean: on_fail
 
 workflows:
     default:
