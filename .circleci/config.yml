@@ -189,7 +189,8 @@ jobs:
                       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
                       --region=us-east-1 \
-                      --output text) >>~/project/.circleci/ansible/hosts
+                      --output text) >>~/project/.circleci/ansible/hosts && \
+                      cat /project/.circle/ansible/hosts
             - persist_to_workspace:
                   root: ~/
                   paths:
@@ -221,7 +222,7 @@ jobs:
             - run:
                   name: Configure server
                   command: |
-                      cat ~/project/.circleci/ansible/hosts && \
+                      cat hosts && \
                       sleep 240s && \
                       cd .circleci/ansible && \
                       ansible-playbook -i hosts configure-server.yml
