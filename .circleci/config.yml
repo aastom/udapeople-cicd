@@ -190,7 +190,7 @@ jobs:
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
                       --region=us-east-1 \
                       --output text) >>~/project/.circleci/ansible/hosts && \
-                      cat ~/project/.circle/ansible/hosts
+                      cat ~/project/.circleci/ansible/hosts
             - persist_to_workspace:
                   root: ~/
                   paths:
