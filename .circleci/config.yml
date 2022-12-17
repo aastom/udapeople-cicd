@@ -1,266 +1,281 @@
 version: 2.1
 
 orbs:
-    slack: circleci/slack@4.12.0
+  slack: circleci/slack@4.12.0
 
 commands:
-    destroy-environment:
-        description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-        parameters:
-            stack-name:
-                description: Name of the stack to destroy.
-                type: string
-        steps:
-            - run:
-                  name: Destroy environments
-                  when: on_fail
-                  command: |
-                      aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      stack-name:
+        description: Name of the stack to destroy.
+        type: string
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
 
 jobs:
-    build-frontend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [frontend-build]
-            - run:
-                  name: Build front-end
-                  command: |
-                      cd frontend && \
-                      npm install && \
-                      npm run build
-            - save_cache:
-                  paths: [frontend/node_modules]
-                  key: frontend-build
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
+  build-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Build front-end
+          command: |
+            cd frontend && \
+            npm install && \
+            npm run build
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: pass
+          template: basic_success_1
 
-    build-backend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [backend-build]
-            - run:
-                  name: Back-end build
-                  command: |
-                      cd backend && \
-                      npm install && \
-                      npm run build
-            - save_cache:
-                  paths: [backend/node_modules]
-                  key: backend-build
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: pass
-                  template: basic_success_1
-    test-frontend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [frontend-build]
-            - run:
-                  name: Run frontend test
-                  command: |
-                      cd frontend && \
-                      npm install && \
-                      npm run test
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
+  build-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Back-end build
+          command: |
+            cd backend && \
+            npm install && \
+            npm run build
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: pass
+          template: basic_success_1
+  test-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Run frontend test
+          command: |
+            cd frontend && \
+            npm install && \
+            npm run test
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
 
-    test-backend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [backend-build]
-            - run:
-                  name: Run backend test
-                  command: |
-                      cd backend && \
-                      npm install && \
-                      npm run test
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
+  test-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Run backend test
+          command: |
+            cd backend && \
+            npm install && \
+            npm run test
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
 
-    scan-frontend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [frontend-build]
-            - run:
-                  name: Run frontend vulnerability scan
-                  command: |
-                      cd frontend && \
-                      npm install && \
-                      npm audit fix --audit-level=critical --force && \
-                      npm audit fix --force && \
-                      npm audit --audit-level=critical
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Run frontend vulnerability scan
+          command: |
+            cd frontend && \
+            npm install && \
+            npm audit fix --audit-level=critical --force && \
+            npm audit fix --force && \
+            npm audit --audit-level=critical
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
 
-    scan-backend:
-        docker:
-            - image: circleci/node:13.8.0
-        steps:
-            - checkout
-            - restore_cache:
-                  keys: [backend-build]
-            - run:
-                  name: Run backend vulnerability scan
-                  command: |
-                      cd backend && \
-                      npm install && \
-                      npm audit fix --audit-level=critical --force && \
-                      npm audit fix --force && \
-                      npm audit --audit-level=critical
-            - slack/notify:
-                  channel: space-shuttle-engineering
-                  branch_pattern: main
-                  event: fail
-                  mentions: "@EngineeringTeam"
-                  template: basic_fail_1
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Run backend vulnerability scan
+          command: |
+            cd backend && \
+            npm install && \
+            npm audit fix --audit-level=critical --force && \
+            npm audit fix --force && \
+            npm audit --audit-level=critical
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
 
-    deploy-infrastructure:
-        docker:
-            - image: amazon/aws-cli
-        steps:
-            - checkout
-            - run:
-                  name: Install tar utility
-                  command: |
-                      yum install -y tar gzip
-            - run:
-                  name: Ensure back-end infrastructure exists
-                  command: |
-                      aws cloudformation deploy \
-                      --template-file .circleci/files/backend.yml \
-                      --tags project=udapeople \
-                      --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            - run:
-                  name: Ensure front-end infrastructure exist
-                  command: |
-                      aws cloudformation deploy \
-                      --template-file .circleci/files/frontend.yml \
-                      --tags project=udapeople \
-                      --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            - run:
-                  name: Add back-end ip to ansible inventory
-                  command: |
-                      echo $(aws ec2 describe-instances \
-                      --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                      --region=us-east-1 \
-                      --output text) >>~/project/.circleci/ansible/hosts && \
-                      cat ~/project/.circleci/ansible/hosts
-            - persist_to_workspace:
-                  root: ~/
-                  paths:
-                      - project/.circleci/ansible/hosts
-            - destroy-environment:
-                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            - destroy-environment:
-                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-
-    configure-infrastructure:
-        docker:
-            - image: python:3.7-alpine3.11
-        steps:
-            - checkout
-            - add_ssh_keys:
-                  fingerprints:
-                      ["8c:ef:3c:59:d1:8e:be:69:40:28:0e:90:4e:76:b9:47"]
-            - attach_workspace:
-                  at: ~/
-            - run:
-                  name: Install dependencies
-                  command: |
-                      apk update && \
-                      apk upgrade && \
-                      apk add ansible && \
-                      apk add tar && \
-                      apk add gzip && \
-                      python -m pip install awscli && \
-                      apk add tree && \
-                      tree
-            - run:
-                  name: Configure server
-                  command: |
-                      cd project/.circleci/ansible && \
-                      ansible-playbook -i hosts configure-server.yml
-            - destroy-environment:
-                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            - destroy-environment:
-                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/frontend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            echo $(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --region=us-east-1 \
+            --output text) >>~/project/.circleci/ansible/hosts && \
+            cat ~/project/.circleci/ansible/hosts
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/hosts
+      - destroy-environment:
+          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: pass
+          template: basic_success_1
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["8c:ef:3c:59:d1:8e:be:69:40:28:0e:90:4e:76:b9:47"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk update && \
+            apk upgrade && \
+            apk add ansible && \
+            apk add tar && \
+            apk add gzip && \
+            python -m pip install awscli && \
+            apk add tree && \
+            cat .circleci/ansible/hosts
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible && \
+            ansible-playbook -i hosts configure-server.yml
+      - destroy-environment:
+          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - slack/notify:
+          channel: space-shuttle-engineering
+          branch_pattern: main
+          event: fail
+          mentions: "@EngineeringTeam"
+          template: basic_fail_1
 
 workflows:
-    default:
-        jobs:
-            - build-frontend:
-                  context: UdaPeopleContext
-            - build-backend:
-                  context: UdaPeopleContext
-            - test-frontend:
-                  requires:
-                      - build-frontend
-                  context: UdaPeopleContext
-            - test-backend:
-                  requires:
-                      - build-backend
-                  context: UdaPeopleContext
-            - scan-frontend:
-                  requires:
-                      - build-frontend
-                  context: UdaPeopleContext
-            - scan-backend:
-                  requires:
-                      - build-backend
-                  context: UdaPeopleContext
-            - deploy-infrastructure:
-                  requires:
-                      - test-frontend
-                      - test-backend
-                      - scan-frontend
-                      - scan-backend
-                  context: UdaPeopleContext
-            - configure-infrastructure:
-                  requires:
-                      - deploy-infrastructure
+  default:
+    jobs:
+      - build-frontend:
+          context: UdaPeopleContext
+      - build-backend:
+          context: UdaPeopleContext
+      - test-frontend:
+          requires:
+            - build-frontend
+          context: UdaPeopleContext
+      - test-backend:
+          requires:
+            - build-backend
+          context: UdaPeopleContext
+      - scan-frontend:
+          requires:
+            - build-frontend
+          context: UdaPeopleContext
+      - scan-backend:
+          requires:
+            - build-backend
+          context: UdaPeopleContext
+      - deploy-infrastructure:
+          requires:
+            - test-frontend
+            - test-backend
+            - scan-frontend
+            - scan-backend
+          context: UdaPeopleContext
+      - configure-infrastructure:
+          requires:
+            - deploy-infrastructure
