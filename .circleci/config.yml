@@ -218,11 +218,12 @@ jobs:
                       apk add ansible && \
                       apk add tar && \
                       apk add gzip && \
-                      python -m pip install awscli
+                      python -m pip install awscli && \
+                      apk add tree && \
+                      tree
             - run:
                   name: Configure server
                   command: |
-                      sleep 240s && \
                       cd project/.circleci/ansible && \
                       ansible-playbook -i hosts configure-server.yml
             - destroy-environment:
