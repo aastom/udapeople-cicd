@@ -12,7 +12,7 @@ commands:
                 type: string
             clean:
                 description: run only on failure.
-                type: boolean
+                type: string
         steps:
             - when:
                   condition: <<parameters.clean>>
