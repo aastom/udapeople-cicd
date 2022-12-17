@@ -10,17 +10,11 @@ commands:
             stack-name:
                 description: Name of the stack to destroy.
                 type: string
-            clean:
-                description: run only on failure.
-                type: string
         steps:
-            - when:
-                  condition: <<parameters.clean>>
-                  steps:
-                      - run:
-                            name: Destroy environments
-                            command: |
-                                aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
+            - run:
+                  name: Destroy environments
+                  command: |
+                      aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
 
 jobs:
     build-frontend:
@@ -190,19 +184,23 @@ jobs:
             - run:
                   name: Add back-end ip to ansible inventory
                   command: |
-                      echo $(aws ec2 describe-instances --instance-ids ${CIRCLE_WORKFLOW_ID:0:7} --query 'Reservations[*].Instances[*].PublicIpAddress' --region=us-east-1 --output text) >>~/project/.circleci/ansible/hosts
+                      echo $(aws ec2 describe-instances \
+                      --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                      --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                      --region=us-east-1 \
+                      --output text) >>~/project/.circleci/ansible/hosts
 
             - persist_to_workspace:
                   root: ~/
                   paths:
                       - project/.circleci/ansible/hosts
 
-            # - destroy-environment:
-            #       stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            #       clean: on_fail
-            # - destroy-environment:
-            #       stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-            #       clean: on_fail
+            - destroy-environment:
+                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+              when: on_fail
+            - destroy-environment:
+                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+              when: on_fail
 
 workflows:
     default:
