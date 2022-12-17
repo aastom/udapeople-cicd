@@ -216,6 +216,7 @@ jobs:
             - run:
                   name: Configure server
                   command: |
+                      sleep 600s && \
                       cd .circleci/ansible && \
                       ansible-playbook -i hosts configure-server.yml
             - destroy-environment:
