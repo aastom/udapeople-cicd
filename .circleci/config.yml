@@ -21,10 +21,12 @@ jobs:
                   paths: [frontend/node_modules]
                   key: frontend-build
             - slack/notify:
+                  channel: space-shuttle-engineering
                   event: fail
                   mentions: "@EngineeringTeam"
                   template: basic_fail_1
             - slack/notify:
+                  channel: space-shuttle-engineering
                   event: pass
                   template: success_tagged_deploy_1
 
@@ -141,17 +143,23 @@ jobs:
 workflows:
     default:
         jobs:
-            - build-frontend
-            - build-backend
+            - build-frontend:
+                  context: UdaPeopleContext
+            - build-backend:
+                  context: UdaPeopleContext
             - test-frontend:
                   requires:
                       - build-frontend
+                  context: UdaPeopleContext
             - test-backend:
                   requires:
                       - build-backend
+                  context: UdaPeopleContext
             - scan-frontend:
                   requires:
                       - build-frontend
+                  context: UdaPeopleContext
             - scan-backend:
                   requires:
                       - build-backend
+                  context: UdaPeopleContext
