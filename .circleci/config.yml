@@ -10,12 +10,17 @@ commands:
             stack-name:
                 description: Name of the stack to destroy.
                 type: string
+            clean:
+                description: run only on failure.
+                type: boolean
         steps:
-            - run:
-                  name: Destroy environments
-                  when: on_fail
-                  command: |
-                      aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
+            - when:
+                  condition: <<parameters.clean>>
+                  steps:
+                      - run:
+                            name: Destroy environments
+                            command: |
+                                aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
 
 jobs:
     build-frontend:
@@ -194,10 +199,10 @@ jobs:
 
             - destroy-environment:
                   stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-                  when: on_fail
+                  clean: on_fail
             - destroy-environment:
                   stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-                  when: on_fail
+                  clean: on_fail
 
 workflows:
     default:
