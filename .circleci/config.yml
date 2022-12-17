@@ -217,3 +217,10 @@ workflows:
                   requires:
                       - build-backend
                   context: UdaPeopleContext
+            - deploy-infrastructure:
+                  requires:
+                      - test-frontend
+                      - test-backend
+                      - scan-frontend
+                      - scan-backend
+                  context: UdaPeopleContext
