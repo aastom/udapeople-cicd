@@ -212,11 +212,16 @@ jobs:
             - run:
                   name: Install dependencies
                   command: |
-                      apk add --update ansible
+                      apk update && \
+                      apk upgrade && \
+                      apk add ansible && \
+                      apk add tar && \
+                      apk add gzip && \
+                      apk add aws-cli
             - run:
                   name: Configure server
                   command: |
-                      sleep 600s && \
+                      sleep 500s && \
                       cd .circleci/ansible && \
                       ansible-playbook -i hosts configure-server.yml
             - destroy-environment:
