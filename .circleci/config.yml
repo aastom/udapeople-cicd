@@ -197,10 +197,10 @@ jobs:
 
             - destroy-environment:
                   stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-              when: on_fail
+                  when: on_fail
             - destroy-environment:
                   stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-              when: on_fail
+                  when: on_fail
 
 workflows:
     default:
