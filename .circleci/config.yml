@@ -382,6 +382,62 @@ jobs:
                   event: pass
                   template: basic_success_1
 
+    smoke-test:
+        docker:
+            - image: python:3.7-alpine3.11
+        steps:
+            - checkout
+            - run:
+                  name: Install dependencies
+                  command: |
+                      apk update && \
+                      apk upgrade && \
+                      apk add ansible && \
+                      apk add tar && \
+                      apk add gzip && \
+                      apk add nodejs && \
+                      apk add npm && \
+                      apk add curl && \
+                      python -m pip install awscli
+            - run:
+                  name: Get backend url
+                  command: |
+                      export BACKEND_IP=$(aws ec2 describe-instances \
+                      --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                      --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                      --region=us-east-1 \
+                      --output text) && \
+                      export API_URL="http://${BACKEND_IP}:3030" && \
+            - run:
+                  name: Backend smoke test.
+                  command: |
+                      if curl "${API_URL}/api/status" | grep "ok"
+                      then
+                        return 0
+                      else
+                        return 1
+                      fi
+            - run:
+                  name: Frontend smoke test.
+                  command: |
+                      URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"
+                      if curl -s ${URL} | grep "Welcome"
+                      then 
+                        return 1
+                      else
+                        return 1
+                      fi
+            - destroy-environment:
+                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            - destroy-environment:
+                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            - slack/notify:
+                  channel: space-shuttle-engineering
+                  branch_pattern: main
+                  event: fail
+                  mentions: "@EngineeringTeam"
+                  template: basic_fail_1
+
 workflows:
     default:
         jobs:
@@ -427,4 +483,9 @@ workflows:
             - deploy-backend:
                   requires:
                       - run-migrations
+                  context: UdaPeopleContext
+            - smoke-test:
+                  requires:
+                      - deploy-backend
+                      - deploy-frontend
                   context: UdaPeopleContext
