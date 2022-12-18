@@ -229,6 +229,7 @@ jobs:
                       apk add ansible && \
                       apk add tar && \
                       apk add gzip && \
+                      apk add curl && \
                       python -m pip install awscli
             - run:
                   name: Configure server
@@ -294,6 +295,7 @@ jobs:
                       apk add gzip && \
                       apk add nodejs && \
                       apk add npm && \
+                      apk add curl && \
                       python -m pip install awscli
             - run:
                   name: Get backend url
@@ -348,7 +350,8 @@ jobs:
                       apk add tar && \
                       apk add gzip && \
                       apk add nodejs && \
-                      apk add npm
+                      apk add npm && \
+                      apk add curl
             - run:
                   name: Deploy backend
                   command: |
