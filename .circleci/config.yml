@@ -351,7 +351,8 @@ jobs:
                       apk add gzip && \
                       apk add nodejs && \
                       apk add npm && \
-                      apk add curl
+                      apk add curl && \
+                      python -m pip install awscli
             - run:
                   name: Deploy backend
                   command: |
