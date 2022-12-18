@@ -14,12 +14,17 @@
 - name: Install pm2
   shell: npm install pm2 -g
 
+- name: Create backend directory
+  file:
+    path: ~/backend
+    state: directory
+
 - name: Unpack the artefact
   ansible.builtin.unarchive:
     src: artifact.tar.gz
-    dest: ~/
+    dest: ~/backend
 
 - name: Run the application
   shell: npm install && pm2 stop default && pm2 start npm -- start
   args:
-    chdir: ~/artifact
+    chdir: ~/backend
