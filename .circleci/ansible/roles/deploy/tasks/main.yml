@@ -29,11 +29,6 @@
   args:
     chdir: ~/backend
 
-- name: stop default pm2
-  shell: pm2 stop default
-  args:
-    chdir: ~/backend
-
 - name: start the server
   shell: pm2 start npm -- start
   args:
