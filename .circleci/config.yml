@@ -329,6 +329,55 @@ jobs:
                   event: pass
                   template: basic_success_1
 
+    deploy-backend:
+        docker:
+            - image: python:3.7-alpine3.11
+        steps:
+            - checkout
+            - add_ssh_keys:
+                  fingerprints:
+                      ["8c:ef:3c:59:d1:8e:be:69:40:28:0e:90:4e:76:b9:47"]
+            - attach_workspace:
+                  at: ~/
+            - run:
+                  name: Install dependencies
+                  command: |
+                      apk update && \
+                      apk upgrade && \
+                      apk add ansible && \
+                      apk add tar && \
+                      apk add gzip && \
+                      apk add nodejs && \
+                      apk add npm
+            - run:
+                  name: Deploy backend
+                  command: |
+                      cd backend && \
+                      npm i && \
+                      npm run build && \
+                      cd .. && \
+                      tar -C backend -czvf artifact.tar.gz . && \
+                      cp artifact.tar.gz .circleci/ansible/roles/deploy/files/. &&\
+                      cd .circleci/ansible && \
+                      echo "Contents  of the hosts file is -------" && \
+                      cat hosts && \
+                      ansible-playbook -i hosts deploy-backend.yml
+            - destroy-environment:
+                  stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            - destroy-environment:
+                  stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+            - slack/notify:
+                  channel: space-shuttle-engineering
+                  branch_pattern: main
+                  event: fail
+                  mentions: "@EngineeringTeam"
+                  template: basic_fail_1
+            - slack/notify:
+                  channel: space-shuttle-engineering
+                  branch_pattern: main
+                  event: pass
+                  template: basic_success_1
+
 workflows:
     default:
         jobs:
@@ -362,9 +411,12 @@ workflows:
             - configure-infrastructure:
                   requires:
                       - deploy-infrastructure
+                  context: UdaPeopleContext
             - run-migrations:
                   requires:
                       - configure-infrastructure
+                  context: UdaPeopleContext
             - deploy-frontend:
                   requires:
                       - run-migrations
+                  context: UdaPeopleContext

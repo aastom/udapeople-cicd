@@ -1,0 +1,25 @@
+---
+- name: Update packages
+  apt:
+    update_cache: yes
+  tags:
+    - system
+
+- name: Install packages
+  apt:
+    name: ["python3", "nodejs", "npm"]
+    state: present
+    update_cache: yes
+
+- name: Install pm2
+  shell: npm install pm2 -g
+
+- name: Unpack the artefact
+  ansible.builtin.unarchive:
+    src: artifact.tar.gz
+    dest: ~/
+
+- name: Run the application
+  shell: npm install && pm2 stop default && pm2 start npm -- start
+  args:
+    chdir: ~/artifact
