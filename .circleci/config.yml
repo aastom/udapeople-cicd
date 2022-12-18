@@ -433,7 +433,7 @@ jobs:
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
                       --region=us-east-1 \
                       --output text) && \
-                      export API_URL="http://${BACKEND_IP}:3030" && \
+                      export API_URL="http://${BACKEND_IP}:3030"
             - run:
                   name: Backend smoke test.
                   command: |
