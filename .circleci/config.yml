@@ -467,7 +467,7 @@ jobs:
                       apk add nodejs && \
                       apk add npm && \
                       apk add curl && \
-                      python -m pip install awscli
+                      python -m pip install awscliv2
             - run:
                   name: Update cloudfront distribution
                   command: |
