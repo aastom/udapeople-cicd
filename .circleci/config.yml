@@ -504,58 +504,58 @@ jobs:
 workflows:
     default:
         jobs:
-            # - build-frontend:
-            #       context: UdaPeopleContext
-            # - build-backend:
-            #       context: UdaPeopleContext
-            # - test-frontend:
-            #       requires:
-            #           - build-frontend
-            #       context: UdaPeopleContext
-            # - test-backend:
-            #       requires:
-            #           - build-backend
-            #       context: UdaPeopleContext
-            # - scan-frontend:
-            #       requires:
-            #           - build-frontend
-            #       context: UdaPeopleContext
-            # - scan-backend:
-            #       requires:
-            #           - build-backend
-            #       context: UdaPeopleContext
-            # - deploy-infrastructure:
-            #       requires:
-            #           - test-frontend
-            #           - test-backend
-            #           - scan-frontend
-            #           - scan-backend
-            #       context: UdaPeopleContext
-            # - configure-infrastructure:
-            #       requires:
-            #           - deploy-infrastructure
-            #       context: UdaPeopleContext
-            # - run-migrations:
-            #       requires:
-            #           - configure-infrastructure
-            #       context: UdaPeopleContext
-            # - deploy-frontend:
+            - build-frontend:
+                  context: UdaPeopleContext
+            - build-backend:
+                  context: UdaPeopleContext
+            - test-frontend:
+                  requires:
+                      - build-frontend
+                  context: UdaPeopleContext
+            - test-backend:
+                  requires:
+                      - build-backend
+                  context: UdaPeopleContext
+            - scan-frontend:
+                  requires:
+                      - build-frontend
+                  context: UdaPeopleContext
+            - scan-backend:
+                  requires:
+                      - build-backend
+                  context: UdaPeopleContext
+            - deploy-infrastructure:
+                  requires:
+                      - test-frontend
+                      - test-backend
+                      - scan-frontend
+                      - scan-backend
+                  context: UdaPeopleContext
+            - configure-infrastructure:
+                  requires:
+                      - deploy-infrastructure
+                  context: UdaPeopleContext
+            - run-migrations:
+                  requires:
+                      - configure-infrastructure
+                  context: UdaPeopleContext
+            - deploy-frontend:
+                  requires:
+                      - run-migrations
+                  context: UdaPeopleContext
+            # - deploy-backend:
             #       requires:
             #           - run-migrations
             #       context: UdaPeopleContext
-            # # - deploy-backend:
-            # #       requires:
-            # #           - run-migrations
-            # #       context: UdaPeopleContext
-            # - smoke-test:
-            #       requires:
-            #           - deploy-frontend
-            #       context: UdaPeopleContext
-            # - cloudfront-update:
-            #       requires:
-            #           - smoke-test
-            #       context: UdaPeopleContext
-            - cleanup:
-                  #   requires:
-                  #       - cloudfront-update
+            - smoke-test:
+                  requires:
+                      - deploy-frontend
                   context: UdaPeopleContext
+            - cloudfront-update:
+                  requires:
+                      - smoke-test
+                  context: UdaPeopleContext
+            # - cleanup:
+            #         requires:
+            #             - cloudfront-update
+            #       context: UdaPeopleContext
