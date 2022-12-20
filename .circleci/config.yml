@@ -191,7 +191,7 @@ jobs:
                       --template-file .circleci/files/backend.yml \
                       --tags project=udapeople \
                       --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" --region=us-east-2
             - run:
                   name: Ensure front-end infrastructure exist
                   command: |
@@ -199,14 +199,14 @@ jobs:
                       --template-file .circleci/files/frontend.yml \
                       --tags project=udapeople \
                       --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" --region=us-east-2
             - run:
                   name: Add back-end ip to ansible inventory
                   command: |
                       echo $(aws ec2 describe-instances \
                       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                      --region=us-east-1 \
+                      --region=us-east-2 \
                       --output text) >>~/project/.circleci/ansible/hosts && \
                       cat ~/project/.circleci/ansible/hosts
             - persist_to_workspace:
@@ -315,10 +315,10 @@ jobs:
                       export BACKEND_IP=$(aws ec2 describe-instances \
                       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                      --region=us-east-1 \
+                      --region=us-east-2 \
                       --output text) && \
-                      export API_URL="http://3.85.208.97:3030" && \
-                      echo API_URL="http://3.85.208.97:3030" >> frontend/.env
+                      export API_URL="http://${BACKEND_IP}:3030" && \
+                      echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             - run:
                   name: Deploy frontend objects
                   command: |
@@ -418,7 +418,7 @@ jobs:
                       export BACKEND_IP=$(aws ec2 describe-instances \
                       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                      --region=us-east-1 \
+                      --region=us-east-2 \
                       --output text) && \
                       export API_URL="http://${BACKEND_IP}:3030" &&\
                       echo ${API_URL} &&\
@@ -431,7 +431,7 @@ jobs:
             - run:
                   name: Frontend smoke test.
                   command: |
-                      URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"
+                      URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-2.amazonaws.com/#/employees"
                       if curl -s ${URL} | grep "Welcome"
                       then 
                         return 0
@@ -461,7 +461,7 @@ jobs:
             - run:
                   name: Update cloudfront distribution
                   command: |
-                      aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-1
+                      aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-2
             - destroy-environment:
                   workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
             - revert-migrations:
@@ -543,19 +543,19 @@ workflows:
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
-            # - deploy-backend:
-            #       requires:
-            #           - run-migrations
-            #       context: UdaPeopleContext
-            # - smoke-test:
-            #       requires:
-            #           - deploy-frontend
-            #       context: UdaPeopleContext
-            - cloudfront-update:
+            - deploy-backend:
+                  requires:
+                      - run-migrations
+                  context: UdaPeopleContext
+            - smoke-test:
                   requires:
                       - deploy-frontend
                   context: UdaPeopleContext
-            # - cleanup:
-            #       requires:
-            #           - cloudfront-update
-            #       context: UdaPeopleContext
+            - cloudfront-update:
+                  requires:
+                      - smoke-test
+                  context: UdaPeopleContext
+            - cleanup:
+                  requires:
+                      - cloudfront-update
+                  context: UdaPeopleContext
