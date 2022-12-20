@@ -8,8 +8,5 @@
 - name: Install nvm
   shell: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
-- name: Add nvm profile configuration
-  shell: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && . ~/.profile
-
 - name: install node13.8.0
-  shell: nvm install 13.8.0 && nvm use 13.8.0
+  shell: $HOME/.nvm/nvm.sh install 13.8.0 && $HOME/.nvm/nvm.sh use 13.8.0
