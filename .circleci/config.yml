@@ -552,8 +552,8 @@ workflows:
             #           - deploy-frontend
             #       context: UdaPeopleContext
             - cloudfront-update:
-                  #   requires:
-                  #       - smoke-test
+                  requires:
+                      - deploy-frontend
                   context: UdaPeopleContext
             # - cleanup:
             #       requires:
