@@ -9,7 +9,7 @@
   shell: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 - name: Add nvm profile configuration
-  shell: export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && exec source ~/.profile
+  shell: source ~/.profile
 
 - name: install node13.8.0
   shell: nvm install 13.8.0
