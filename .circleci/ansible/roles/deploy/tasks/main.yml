@@ -28,8 +28,3 @@
   shell: npm install
   args:
     chdir: ~/backend
-
-- name: start the server
-  shell: npm run start
-  args:
-    chdir: ~/backend
