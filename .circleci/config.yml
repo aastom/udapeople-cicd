@@ -241,7 +241,7 @@ jobs:
                   name: Install dependencies
                   command: |
                       sudo apt install ansible && \
-                      sudo apt add tar && \
+                      sudo apt install tar && \
                       sudo apt install gzip && \
                       sudo apt install curl && \
                       sudo apt install awscli
@@ -299,7 +299,7 @@ jobs:
                   name: Install dependencies
                   command: |
                       sudo apt install ansible && \
-                      sudo apt add tar && \
+                      sudo apt install tar && \
                       sudo apt install gzip && \
                       sudo apt install curl && \
                       sudo apt install awscli
@@ -351,7 +351,7 @@ jobs:
                   name: Install dependencies
                   command: |
                       sudo apt install ansible && \
-                      sudo apt add tar && \
+                      sudo apt install tar && \
                       sudo apt install gzip && \
                       sudo apt install curl && \
                       sudo apt install awscli
@@ -415,6 +415,8 @@ jobs:
                       if curl "${API_URL}/api/status" | grep "ok"
                       then
                         return 0
+                      else
+                        return 1
                       fi
             - run:
                   name: Frontend smoke test.
@@ -449,7 +451,7 @@ jobs:
             - run:
                   name: Update cloudfront distribution
                   command: |
-                      #aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name udapeople-frontend-1dd987f --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-1
+                      aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-1
             - destroy-environment:
                   workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
             - revert-migrations:
