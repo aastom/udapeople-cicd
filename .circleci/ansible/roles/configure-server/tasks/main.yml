@@ -10,4 +10,4 @@
 
 - name: install node13.8.0
   become: true
-  shell: $HOME/.nvm/nvm.sh install 13.8.0 && $HOME/.nvm/nvm.sh use 13.8.0
+  shell: chmod +x $HOME/.nvm/nvm.sh && $HOME/.nvm/nvm.sh install 13.8.0 && $HOME/.nvm/nvm.sh use 13.8.0
