@@ -9,4 +9,4 @@
   shell: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
 - name: install node13.8.0
-  shell: nvm install 13.8.0
+  shell: exec $SHELL -l && nvm install 13.8.0
