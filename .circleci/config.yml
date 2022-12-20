@@ -190,7 +190,7 @@ jobs:
                       aws cloudformation deploy --template-file .circleci/files/backend.yml \
                       --tags project=udapeople \
                       --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" --region=us-east-2
+                      --region=us-east-2
             - run:
                   name: Ensure front-end infrastructure exist
                   command: |
@@ -198,7 +198,7 @@ jobs:
                       --template-file .circleci/files/frontend.yml \
                       --tags project=udapeople \
                       --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                      --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" --region=us-east-2
+                      --region=us-east-2
             - run:
                   name: Add back-end ip to ansible inventory
                   command: |
@@ -460,7 +460,7 @@ jobs:
             - run:
                   name: Update cloudfront distribution
                   command: |
-                      aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-2
+                      aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack  --tags project=udapeople --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region us-east-2
             - destroy-environment:
                   workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
             - revert-migrations:
