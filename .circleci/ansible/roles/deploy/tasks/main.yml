@@ -30,6 +30,6 @@
     chdir: ~/backend
 
 - name: start the server
-  shell: npm run migrations && npm run start
+  shell: npm run start
   args:
     chdir: ~/backend
