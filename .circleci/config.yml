@@ -317,8 +317,8 @@ jobs:
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
                       --region=us-east-1 \
                       --output text) && \
-                      export API_URL="http://${BACKEND_IP}:3030" && \
-                      echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+                      export API_URL="http://3.85.208.97:3030" && \
+                      echo API_URL="http://3.85.208.97:3030" >> frontend/.env
             - run:
                   name: Deploy frontend objects
                   command: |
@@ -543,19 +543,19 @@ workflows:
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
-            - deploy-backend:
-                  requires:
-                      - run-migrations
-                  context: UdaPeopleContext
-            - smoke-test:
-                  requires:
-                      - deploy-frontend
-                  context: UdaPeopleContext
+            # - deploy-backend:
+            #       requires:
+            #           - run-migrations
+            #       context: UdaPeopleContext
+            # - smoke-test:
+            #       requires:
+            #           - deploy-frontend
+            #       context: UdaPeopleContext
             - cloudfront-update:
                   requires:
                       - smoke-test
                   context: UdaPeopleContext
-            - cleanup:
-                  requires:
-                      - cloudfront-update
-                  context: UdaPeopleContext
+            # - cleanup:
+            #       requires:
+            #           - cloudfront-update
+            #       context: UdaPeopleContext
