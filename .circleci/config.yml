@@ -229,7 +229,7 @@ jobs:
 
     configure-infrastructure:
         docker:
-            - image: python:3.7-alpine3.11
+            - image: circleci/node:13.8.0
         steps:
             - checkout
             - add_ssh_keys:
@@ -240,13 +240,11 @@ jobs:
             - run:
                   name: Install dependencies
                   command: |
-                      apk update && \
-                      apk upgrade && \
-                      apk add ansible && \
-                      apk add tar && \
-                      apk add gzip && \
-                      apk add curl && \
-                      python -m pip install awscli
+                      sudo apt install ansible && \
+                      sudo apt add tar && \
+                      sudo apt install gzip && \
+                      sudo apt install curl && \
+                      sudo apt install awscli
             - run:
                   name: Configure server
                   command: |
@@ -292,7 +290,7 @@ jobs:
 
     deploy-frontend:
         docker:
-            - image: python:3.7-alpine3.11
+            - image: circleci/node:13.8.0
         steps:
             - checkout
             - attach_workspace:
@@ -300,15 +298,11 @@ jobs:
             - run:
                   name: Install dependencies
                   command: |
-                      apk update && \
-                      apk upgrade && \
-                      apk add ansible && \
-                      apk add tar && \
-                      apk add gzip && \
-                      apk add nodejs && \
-                      apk add npm && \
-                      apk add curl && \
-                      python -m pip install awscli
+                      sudo apt install ansible && \
+                      sudo apt add tar && \
+                      sudo apt install gzip && \
+                      sudo apt install curl && \
+                      sudo apt install awscli
             - run:
                   name: Get backend url
                   command: |
@@ -345,7 +339,7 @@ jobs:
 
     deploy-backend:
         docker:
-            - image: python:3.7-alpine3.11
+            - image: circleci/node:13.8.0
         steps:
             - checkout
             - add_ssh_keys:
@@ -356,15 +350,11 @@ jobs:
             - run:
                   name: Install dependencies
                   command: |
-                      apk update && \
-                      apk upgrade && \
-                      apk add ansible && \
-                      apk add tar && \
-                      apk add gzip && \
-                      apk add nodejs && \
-                      apk add npm && \
-                      apk add curl && \
-                      python -m pip install awscli
+                      sudo apt install ansible && \
+                      sudo apt add tar && \
+                      sudo apt install gzip && \
+                      sudo apt install curl && \
+                      sudo apt install awscli
             - run:
                   name: Deploy backend
                   command: |
@@ -533,18 +523,18 @@ workflows:
                   requires:
                       - deploy-infrastructure
                   context: UdaPeopleContext
-            # - run-migrations:
-            #       requires:
-            #           - configure-infrastructure
-            #       context: UdaPeopleContext
-            # - deploy-frontend:
-            #       requires:
-            #           - run-migrations
-            #       context: UdaPeopleContext
-            # - deploy-backend:
-            #       requires:
-            #           - run-migrations
-            #       context: UdaPeopleContext
+            - run-migrations:
+                  requires:
+                      - configure-infrastructure
+                  context: UdaPeopleContext
+            - deploy-frontend:
+                  requires:
+                      - run-migrations
+                  context: UdaPeopleContext
+            - deploy-backend:
+                  requires:
+                      - run-migrations
+                  context: UdaPeopleContext
             # - smoke-test:
             #       requires:
             #           - deploy-frontend

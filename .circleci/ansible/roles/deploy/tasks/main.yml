@@ -5,12 +5,6 @@
   tags:
     - system
 
-- name: Install packages
-  apt:
-    name: ["python3", "nodejs", "npm"]
-    state: present
-    update_cache: yes
-
 - name: Install pm2
   shell: npm install pm2 -g
 
@@ -25,6 +19,6 @@
     dest: ~/backend
 
 - name: install the application
-  shell: npm install
+  shell: pm2 start npm -- start
   args:
     chdir: ~/backend
