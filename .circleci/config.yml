@@ -317,8 +317,8 @@ jobs:
                       --query 'Reservations[*].Instances[*].PublicIpAddress' \
                       --region=us-east-1 \
                       --output text) && \
-                      export API_URL="http://3.82.136.9:3030" && \
-                      echo API_URL="http://3.82.136.9:3030" >> frontend/.env
+                      export API_URL="http://${BACKEND_IP}:3030" && \
+                      echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             - run:
                   name: Deploy frontend objects
                   command: |
@@ -343,56 +343,56 @@ jobs:
                   event: pass
                   template: basic_success_1
 
-    # deploy-backend:
-    #     docker:
-    #         - image: python:3.7-alpine3.11
-    #     steps:
-    #         - checkout
-    #         - add_ssh_keys:
-    #               fingerprints:
-    #                   ["8c:ef:3c:59:d1:8e:be:69:40:28:0e:90:4e:76:b9:47"]
-    #         - attach_workspace:
-    #               at: ~/
-    #         - run:
-    #               name: Install dependencies
-    #               command: |
-    #                   apk update && \
-    #                   apk upgrade && \
-    #                   apk add ansible && \
-    #                   apk add tar && \
-    #                   apk add gzip && \
-    #                   apk add nodejs && \
-    #                   apk add npm && \
-    #                   apk add curl && \
-    #                   python -m pip install awscli
-    #         - run:
-    #               name: Deploy backend
-    #               command: |
-    #                   cd backend && \
-    #                   npm i && \
-    #                   npm run build && \
-    #                   cd .. && \
-    #                   tar -C backend -czvf artifact.tar.gz . && \
-    #                   cp artifact.tar.gz .circleci/ansible/roles/deploy/files/. &&\
-    #                   cd .circleci/ansible && \
-    #                   echo "Contents  of the hosts file is -------" && \
-    #                   cat hosts && \
-    #                   ansible-playbook -i hosts deploy-backend.yml
-    #         - destroy-environment:
-    #               workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
-    #         - revert-migrations:
-    #               workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"
-    #         - slack/notify:
-    #               channel: space-shuttle-engineering
-    #               branch_pattern: main
-    #               event: fail
-    #               mentions: "@EngineeringTeam"
-    #               template: basic_fail_1
-    #         - slack/notify:
-    #               channel: space-shuttle-engineering
-    #               branch_pattern: main
-    #               event: pass
-    #               template: basic_success_1
+    deploy-backend:
+        docker:
+            - image: python:3.7-alpine3.11
+        steps:
+            - checkout
+            - add_ssh_keys:
+                  fingerprints:
+                      ["8c:ef:3c:59:d1:8e:be:69:40:28:0e:90:4e:76:b9:47"]
+            - attach_workspace:
+                  at: ~/
+            - run:
+                  name: Install dependencies
+                  command: |
+                      apk update && \
+                      apk upgrade && \
+                      apk add ansible && \
+                      apk add tar && \
+                      apk add gzip && \
+                      apk add nodejs && \
+                      apk add npm && \
+                      apk add curl && \
+                      python -m pip install awscli
+            - run:
+                  name: Deploy backend
+                  command: |
+                      cd backend && \
+                      npm i && \
+                      npm run build && \
+                      cd .. && \
+                      tar -C backend -czvf artifact.tar.gz . && \
+                      cp artifact.tar.gz .circleci/ansible/roles/deploy/files/. &&\
+                      cd .circleci/ansible && \
+                      echo "Contents  of the hosts file is -------" && \
+                      cat hosts && \
+                      ansible-playbook -i hosts deploy-backend.yml
+            - destroy-environment:
+                  workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
+            - revert-migrations:
+                  workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"
+            - slack/notify:
+                  channel: space-shuttle-engineering
+                  branch_pattern: main
+                  event: fail
+                  mentions: "@EngineeringTeam"
+                  template: basic_fail_1
+            - slack/notify:
+                  channel: space-shuttle-engineering
+                  branch_pattern: main
+                  event: pass
+                  template: basic_success_1
 
     smoke-test:
         docker:
@@ -412,22 +412,22 @@ jobs:
                       apk add curl && \
                       python -m pip install awscli
 
-            # - run:
-            #       name: Backend smoke test.
-            #       command: |
-            #           export BACKEND_IP=$(aws ec2 describe-instances \
-            #           --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            #           --region=us-east-1 \
-            #           --output text) && \
-            #           export API_URL="http://3.82.136.9:3030" &&\
-            #           echo ${API_URL} &&\
-            #           if curl "${API_URL}/api/status" | grep "ok"
-            #           then
-            #             return 0
-            #           else
-            #             return 1
-            #           fi
+            - run:
+                  name: Backend smoke test.
+                  command: |
+                      export BACKEND_IP=$(aws ec2 describe-instances \
+                      --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                      --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                      --region=us-east-1 \
+                      --output text) && \
+                      export API_URL="http://${BACKEND_IP}:3030" &&\
+                      echo ${API_URL} &&\
+                      if curl "${API_URL}/api/status" | grep "ok"
+                      then
+                        return 0
+                      else
+                        return 1
+                      fi
             - run:
                   name: Frontend smoke test.
                   command: |
@@ -543,10 +543,10 @@ workflows:
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
-            # - deploy-backend:
-            #       requires:
-            #           - run-migrations
-            #       context: UdaPeopleContext
+            - deploy-backend:
+                  requires:
+                      - run-migrations
+                  context: UdaPeopleContext
             - smoke-test:
                   requires:
                       - deploy-frontend
@@ -555,7 +555,7 @@ workflows:
                   requires:
                       - smoke-test
                   context: UdaPeopleContext
-            # - cleanup:
-            #         requires:
-            #             - cloudfront-update
-            #       context: UdaPeopleContext
+            - cleanup:
+                  requires:
+                      - cloudfront-update
+                  context: UdaPeopleContext
