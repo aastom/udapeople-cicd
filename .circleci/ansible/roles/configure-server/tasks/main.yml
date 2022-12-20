@@ -8,8 +8,5 @@
 - name: Install nvm
   shell: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
-- name: source the bashrc
-  shell: source ~/.bashrc
-
 - name: install node13.8.0
   shell: nvm install 13.8.0
