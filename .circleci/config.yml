@@ -494,67 +494,67 @@ jobs:
             - run:
                   name: Remove old stacks and files
                   command: |
-                      if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
+                      if [[ "udapeople-${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
                       then
-                          aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                          aws s3 rm "s3://${OldWorkflowID}" --recursive
                           aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                           aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
                       fi
 workflows:
     default:
         jobs:
-            - build-frontend:
-                  context: UdaPeopleContext
-            - build-backend:
-                  context: UdaPeopleContext
-            - test-frontend:
-                  requires:
-                      - build-frontend
-                  context: UdaPeopleContext
-            - test-backend:
-                  requires:
-                      - build-backend
-                  context: UdaPeopleContext
-            - scan-frontend:
-                  requires:
-                      - build-frontend
-                  context: UdaPeopleContext
-            - scan-backend:
-                  requires:
-                      - build-backend
-                  context: UdaPeopleContext
-            - deploy-infrastructure:
-                  requires:
-                      - test-frontend
-                      - test-backend
-                      - scan-frontend
-                      - scan-backend
-                  context: UdaPeopleContext
-            - configure-infrastructure:
-                  requires:
-                      - deploy-infrastructure
-                  context: UdaPeopleContext
-            - run-migrations:
-                  requires:
-                      - configure-infrastructure
-                  context: UdaPeopleContext
-            - deploy-frontend:
-                  requires:
-                      - run-migrations
-                  context: UdaPeopleContext
-            # - deploy-backend:
+            # - build-frontend:
+            #       context: UdaPeopleContext
+            # - build-backend:
+            #       context: UdaPeopleContext
+            # - test-frontend:
+            #       requires:
+            #           - build-frontend
+            #       context: UdaPeopleContext
+            # - test-backend:
+            #       requires:
+            #           - build-backend
+            #       context: UdaPeopleContext
+            # - scan-frontend:
+            #       requires:
+            #           - build-frontend
+            #       context: UdaPeopleContext
+            # - scan-backend:
+            #       requires:
+            #           - build-backend
+            #       context: UdaPeopleContext
+            # - deploy-infrastructure:
+            #       requires:
+            #           - test-frontend
+            #           - test-backend
+            #           - scan-frontend
+            #           - scan-backend
+            #       context: UdaPeopleContext
+            # - configure-infrastructure:
+            #       requires:
+            #           - deploy-infrastructure
+            #       context: UdaPeopleContext
+            # - run-migrations:
+            #       requires:
+            #           - configure-infrastructure
+            #       context: UdaPeopleContext
+            # - deploy-frontend:
             #       requires:
             #           - run-migrations
             #       context: UdaPeopleContext
-            - smoke-test:
-                  requires:
-                      - deploy-frontend
-                  context: UdaPeopleContext
-            - cloudfront-update:
-                  requires:
-                      - smoke-test
-                  context: UdaPeopleContext
+            # # - deploy-backend:
+            # #       requires:
+            # #           - run-migrations
+            # #       context: UdaPeopleContext
+            # - smoke-test:
+            #       requires:
+            #           - deploy-frontend
+            #       context: UdaPeopleContext
+            # - cloudfront-update:
+            #       requires:
+            #           - smoke-test
+            #       context: UdaPeopleContext
             - cleanup:
-                  requires:
-                      - cloudfront-update
+                  #   requires:
+                  #       - cloudfront-update
                   context: UdaPeopleContext
