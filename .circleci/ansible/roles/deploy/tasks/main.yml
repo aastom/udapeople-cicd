@@ -28,7 +28,17 @@
   args:
     chdir: ~/backend
 
+- name: assign env
+  shell: mv .env.fix .env
+  args:
+    chdir: ~/backend
+
 - name: install the application
-  shell: mv .env.fix .env && npm install && npm run start
+  shell: npm install
+  args:
+    chdir: ~/backend
+
+- name: run the application
+  shell: npm run start
   args:
     chdir: ~/backend
