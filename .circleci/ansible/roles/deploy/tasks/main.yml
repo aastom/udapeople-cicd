@@ -14,11 +14,11 @@
     state: directory
 
 - name: Unpack the artefact
-  ansible.builtin.unarchive:
-    src: artifact.tar.gz
-    dest: ~/backend
+  shell: apt install dtrx && dtrx artifact.tar.gz
+  args:
+    chdir: ~/backend
 
 - name: install the application
-  shell: pm2 start npm -- start
+  shell: npm install && pm2 start npm -- start
   args:
     chdir: ~/backend
