@@ -18,8 +18,13 @@
     name: ["tar"]
     state: present
 
+- name: copy tar
+  copy:
+    src: artifact.tar.gz
+    dest: /tmp/
+
 - name: Unpack the artefact
-  shell: tar -xf ../files/artifact.tar.gz  -C ~/backend
+  shell: tar -xf /tmp/artifact.tar.gz  -C ~/backend
   args:
     chdir: ~/backend
 
