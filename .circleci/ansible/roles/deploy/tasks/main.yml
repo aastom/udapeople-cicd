@@ -13,8 +13,13 @@
     path: ~/backend
     state: directory
 
+- name: install tar
+  apt:
+    name: ["tar"]
+    state: present
+
 - name: Unpack the artefact
-  shell: apt install dtrx && dtrx artifact.tar.gz
+  shell: tar -czvf artifact.tar.gz
   args:
     chdir: ~/backend
 
