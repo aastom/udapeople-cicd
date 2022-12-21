@@ -14,7 +14,9 @@
     state: directory
 
 - name: Unpack the artefact
-  shell: tar -xf artefact.tar.gz ~/backend
+  ansible.builtin.unarchive:
+    src: artifact.tar.gz
+    dest: ~/backend
 
 - name: install the application
   shell: pm2 start npm -- start
