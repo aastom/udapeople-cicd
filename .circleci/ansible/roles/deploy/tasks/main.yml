@@ -39,6 +39,6 @@
     chdir: ~/backend
 
 - name: run the application
-  shell: npm run start
+  shell: pm2 start npm -- start
   args:
     chdir: ~/backend
