@@ -19,7 +19,7 @@
     state: present
 
 - name: Unpack the artefact
-  shell: tar -czvf artifact.tar.gz ~/backend
+  shell: tar -xf artifact.tar.gz  -C ~/backend
   args:
     chdir: ~/backend
 
