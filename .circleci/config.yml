@@ -306,7 +306,8 @@ jobs:
                       sudo apt install tar && \
                       sudo apt install gzip && \
                       sudo apt install curl && \
-                      sudo apt install awscli
+                      sudo apt install python3 && \
+                      python3 -m pip install awscliv2
             - run:
                   name: Get backend url
                   command: |
