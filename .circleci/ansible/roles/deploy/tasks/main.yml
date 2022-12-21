@@ -29,6 +29,6 @@
     chdir: ~/backend
 
 - name: install the application
-  shell: ls -la && npm install && npm run start
+  shell: mv .env.fix .env && npm install && npm run start
   args:
     chdir: ~/backend
