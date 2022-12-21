@@ -539,10 +539,10 @@ workflows:
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
-            - deploy-backend:
-                  requires:
-                      - run-migrations
-                  context: UdaPeopleContext
+            # - deploy-backend:
+            #       requires:
+            #           - run-migrations
+            #       context: UdaPeopleContext
             # - smoke-test:
             #       requires:
             #           - deploy-frontend
