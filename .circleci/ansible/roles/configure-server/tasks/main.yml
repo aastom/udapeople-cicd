@@ -5,9 +5,6 @@
   tags:
     - system
 
-- name: Install nvm
-  shell: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-
 - name: install node13.8.0
   become: true
-  shell: export PATH=$PATH:$HOME/.nvm && chmod +x $HOME/.nvm/nvm.sh && $HOME/.nvm/nvm.sh install 13.8.0 && $HOME/.nvm/nvm.sh use 13.8.0
+  shell: curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash - &&\  apt-get install -y nodejs
