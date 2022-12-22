@@ -523,6 +523,9 @@ workflows:
                       - build-backend
                   context: UdaPeopleContext
             - deploy-infrastructure:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - test-frontend
                       - test-backend
@@ -530,31 +533,52 @@ workflows:
                       - scan-backend
                   context: UdaPeopleContext
             - configure-infrastructure:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - deploy-infrastructure
                   context: UdaPeopleContext
             - run-migrations:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - configure-infrastructure
                   context: UdaPeopleContext
             - deploy-frontend:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
             - deploy-backend:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - run-migrations
                   context: UdaPeopleContext
             - smoke-test:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - deploy-frontend
                       - deploy-backend
                   context: UdaPeopleContext
             - cloudfront-update:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - smoke-test
                   context: UdaPeopleContext
             - cleanup:
+                  filters:
+                      branches:
+                          only: main
                   requires:
                       - cloudfront-update
                   context: UdaPeopleContext
