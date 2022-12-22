@@ -30,6 +30,7 @@ commands:
                   name: Revert migrations
                   when: on_fail
                   command: |
+                      ls -la 
                       SUCCESS=$(curl --insecure  https://kvdb.io/7Xbtoj3hhzA4wFwTudyxRS/migration_<< parameters.workflow-id >>)
                       if (( $SUCCESS == 1 ));
                       then
@@ -395,21 +396,19 @@ jobs:
 
     smoke-test:
         docker:
-            - image: python:3.7-alpine3.11
+            - image: circleci/node:13.8.0
         steps:
             - checkout
             - run:
                   name: Install dependencies
                   command: |
-                      apk update && \
-                      apk upgrade && \
-                      apk add ansible && \
-                      apk add tar && \
-                      apk add gzip && \
-                      apk add nodejs && \
-                      apk add npm && \
-                      apk add curl && \
-                      python -m pip install awscli
+                      sudo apt update && \
+                      sudo apt upgrade && \
+                      sudo apt install ansible && \
+                      sudo apt install tar && \
+                      sudo apt install gzip && \
+                      sudo apt install curl && \
+                      sudo apt install awscli
 
             - run:
                   name: Backend smoke test.
